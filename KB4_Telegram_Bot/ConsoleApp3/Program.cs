@@ -25,7 +25,7 @@ namespace ConsoleApp3
             //считываем при запуске список файлов
             Search_File_Name();
 
-            var client = new TelegramBotClient("6200203388:AAEEA6D76fCg-LXP24kFytsUe4P5mqD90SI");
+            var client = new TelegramBotClient("5848453722:AAE4shNmKQ5_TEM3t6q_dBFtomLIJmY8y9g");
             client.StartReceiving(Update, Error);
 
             Console.ReadLine();

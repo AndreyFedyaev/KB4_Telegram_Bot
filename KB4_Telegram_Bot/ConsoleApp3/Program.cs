@@ -6,15 +6,22 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using System.IO;
+using System.Text;
+using System.Windows.Input;
 
 
 namespace ConsoleApp3
 {
     internal class Program
     {
+        public static List<string> file_names = new List<string>();
+        public static InlineKeyboardMarkup keyBoard;
+
         static void Main(string[] args)
         {
+            //считываем при запуске список файлов
             Search_File_Name();
+
             var client = new TelegramBotClient("6200203388:AAEEA6D76fCg-LXP24kFytsUe4P5mqD90SI");
             client.StartReceiving(Update, Error);
 
@@ -23,35 +30,38 @@ namespace ConsoleApp3
 
         private static async Task Update(ITelegramBotClient botClient, Update update, CancellationToken token)
         {
-            Search_File_Name();
             var Message = update.Message;
+            string Callback = "";
 
-            string[] filenames = { "file1", "newfile", "lastfile", "testinfilename_new" , "fileFileFile", "Плгртшо Структура Схемплан" };
+            if (update.CallbackQuery != null) Callback = update.CallbackQuery.Data;
 
-
-            
-
-
-            if (Message.Text != null)
+            if (Message != null && Message.Text != null)
             {
                 List<InlineKeyboardButton[]> Row = new List<InlineKeyboardButton[]>();
                 List<InlineKeyboardButton> Col = new List<InlineKeyboardButton>();
+                bool result = false;
 
-                for (int a = 0; a < filenames.Length; a++)
+                for (int a = 0; a < file_names.Count; a++)
                 {
-                    if (filenames[a].ToLower().Contains(Message.Text.ToLower()))
+                    if (file_names[a].ToLower().Contains(Message.Text.ToLower()))
                     {
-                        Col.Add(InlineKeyboardButton.WithCallbackData(filenames[a].ToString()));
+                        Col.Add(InlineKeyboardButton.WithCallbackData(text: file_names[a].ToString(), callbackData: file_names[a].ToString()));
                         Row.Add(Col.ToArray());
                         Col = new List<InlineKeyboardButton>();
+                        result = true;
                     }
                 }
 
-                var keyBoard = new InlineKeyboardMarkup(Row);
+                if (result)
+                {
+                    keyBoard = new InlineKeyboardMarkup(Row.ToArray());
+                    await botClient.SendTextMessageAsync(Message.Chat.Id, "Выберите файл из списка:", replyMarkup: keyBoard, cancellationToken: token);
+                    return;
+                }
+            }
+            if (Callback != null && Callback != "")
+            {
 
-                await botClient.SendTextMessageAsync(Message.Chat.Id, "Выберите файл из списка:", replyMarkup: keyBoard, cancellationToken: token);
-
-                return;
             }
 
         } 
@@ -63,42 +73,17 @@ namespace ConsoleApp3
 
         private static void Search_File_Name()
         {
-            //FileInfo fileInf = new FileInfo("\\Instructions");
-
-            string dirName = "C:\\Users\\Андрей\\source\\repos\\ConsoleApp3\\ConsoleApp3\\bin\\Debug\\netcoreapp3.1\\Instructions\\";
+            string dirName = AppDomain.CurrentDomain.BaseDirectory + "Instructions";
             // если папка существует
             if (Directory.Exists(dirName))
             {
-                Console.WriteLine("Подкаталоги:");
-                string[] dirs = Directory.GetDirectories(dirName);
-                foreach (string s in dirs)
-                {
-                    Console.WriteLine(s);
-                }
-                Console.WriteLine();
-                Console.WriteLine("Файлы:");
                 string[] files = Directory.GetFiles(dirName);
+
                 foreach (string s in files)
                 {
-                    Console.WriteLine(s);
+                    file_names.Add(s.Remove(0, dirName.Length + 1));
                 }
             }
-
-
-            //OpenFileDialog openFileDialog1 = new OpenFileDialog(\Instructions);
-            //    openFileDialog1.InitialDirectory = Environment.CurrentDirectory;
-            //    openFileDialog1.Filter = "Config Files|*.ini";
-            //    openFileDialog1.Multiselect = true;
-
-            //    if (openFileDialog1.ShowDialog() == true)
-            //    {
-            //        string[] result = openFileDialog1.FileNames;
-
-            //        string[] FileName = new string[result.Length];
-            //        for (int i = 0; i < result.Length; i++)
-            //        {
-            //            FileName[i] = System.IO.Path.GetFileNameWithoutExtension(result[i]);
-            //        }
         }
     }
 }

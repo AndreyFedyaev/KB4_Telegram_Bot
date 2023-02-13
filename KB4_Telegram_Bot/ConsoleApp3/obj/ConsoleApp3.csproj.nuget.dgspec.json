@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\С#\\Телеграм бот\\ConsoleApp3\\ConsoleApp3\\ConsoleApp3.csproj": {}
+    "D:\\С#\\GitHub\\KB4_Telegram_Bot\\KB4_Telegram_Bot\\ConsoleApp3\\ConsoleApp3.csproj": {}
   },
   "projects": {
-    "D:\\С#\\Телеграм бот\\ConsoleApp3\\ConsoleApp3\\ConsoleApp3.csproj": {
+    "D:\\С#\\GitHub\\KB4_Telegram_Bot\\KB4_Telegram_Bot\\ConsoleApp3\\ConsoleApp3.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\С#\\Телеграм бот\\ConsoleApp3\\ConsoleApp3\\ConsoleApp3.csproj",
+        "projectUniqueName": "D:\\С#\\GitHub\\KB4_Telegram_Bot\\KB4_Telegram_Bot\\ConsoleApp3\\ConsoleApp3.csproj",
         "projectName": "ConsoleApp3",
-        "projectPath": "D:\\С#\\Телеграм бот\\ConsoleApp3\\ConsoleApp3\\ConsoleApp3.csproj",
+        "projectPath": "D:\\С#\\GitHub\\KB4_Telegram_Bot\\KB4_Telegram_Bot\\ConsoleApp3\\ConsoleApp3.csproj",
         "packagesPath": "C:\\Users\\Fedyaev\\.nuget\\packages\\",
-        "outputPath": "D:\\С#\\Телеграм бот\\ConsoleApp3\\ConsoleApp3\\obj\\",
+        "outputPath": "D:\\С#\\GitHub\\KB4_Telegram_Bot\\KB4_Telegram_Bot\\ConsoleApp3\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Fedyaev\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -56,24 +56,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[3.1.10, 3.1.10]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[3.1.32, 3.1.32]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[3.1.0, 3.1.0]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[3.1.0, 3.1.0]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"

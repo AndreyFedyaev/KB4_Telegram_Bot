@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "KjwuXEzfMLF5YvkgNWyFZMUJ5MBRbPn/VzjRqCP4RPjbGcEYrGAxdMTszNFQbPp36Uw6dnqqd69QTVDyYIGrLQ==",
+  "success": true,
+  "projectFilePath": "D:\\С#\\Телеграм бот\\ConsoleApp3\\ConsoleApp3\\ConsoleApp3.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Fedyaev\\.nuget\\packages\\newtonsoft.json\\12.0.2\\newtonsoft.json.12.0.2.nupkg.sha512",
+    "C:\\Users\\Fedyaev\\.nuget\\packages\\telegram.bot\\18.0.0\\telegram.bot.18.0.0.nupkg.sha512",
+    "C:\\Users\\Fedyaev\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512",
+    "C:\\Users\\Fedyaev\\.nuget\\packages\\microsoft.netcore.app.ref\\3.1.0\\microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
+    "C:\\Users\\Fedyaev\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.10\\microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
+    "C:\\Users\\Fedyaev\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.32\\microsoft.netcore.app.host.win-x64.3.1.32.nupkg.sha512"
+  ],
+  "logs": []
+}

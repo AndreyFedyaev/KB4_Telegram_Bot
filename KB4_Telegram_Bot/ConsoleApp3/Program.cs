@@ -18,6 +18,7 @@ namespace ConsoleApp3
         public static List<string> all_file_names = new List<string>();
         public static List<string> search_file_names = new List<string>();
         public static InlineKeyboardMarkup keyBoard;
+        public static List<string> Add_New_File = new List<string>();
 
         static void Main(string[] args)
         {
@@ -39,48 +40,58 @@ namespace ConsoleApp3
 
             if (Message != null && Message.Text != null)
             {
-                bool result = false;
-                string Answer_text = "";
-
-                //формируем список документов для формирования результата поиска
-                search_file_names.Clear();
-                for (int a = 0; a < all_file_names.Count; a++)
+                if (Message.Text.ToLower() == "add new file" || Message.Text.ToLower() == "addnewfile" || Message.Text.ToLower() == "add newfile")
                 {
-                    if (all_file_names[a].ToLower().Contains(Message.Text.ToLower()))
+                    await botClient.SendTextMessageAsync(Message.Chat.Id, "Перетащите файл для добавления в общий список документов");
+
+                    Add_ID(Message.Chat.Id.ToString());
+                }
+                else
+                {
+                    Delete_ID(Message.Chat.Id.ToString());
+
+                    bool result = false;
+                    string Answer_text = "";
+
+                    //формируем список документов для формирования результата поиска
+                    search_file_names.Clear();
+                    for (int a = 0; a < all_file_names.Count; a++)
                     {
-                        search_file_names.Add(all_file_names[a]);
-                        result = true;
+                        if (all_file_names[a].ToLower().Contains(Message.Text.ToLower()))
+                        {
+                            search_file_names.Add(all_file_names[a]);
+                            result = true;
+                        }
                     }
-                }
-                //формируем сообщение 
-                for (int a = 0; a < search_file_names.Count; a++)
-                {
-                    Answer_text += string.Format("{0}: {1}\r\n", a + 1, search_file_names[a]);
-                }
-                //формируем кнопки
-                List<InlineKeyboardButton[]> Row = new List<InlineKeyboardButton[]>();
-                List<InlineKeyboardButton> Col = new List<InlineKeyboardButton>();
-                for (int a = 1; a < search_file_names.Count + 1; a++)
-                {
-                    Col.Add(InlineKeyboardButton.WithCallbackData(text: a.ToString(), callbackData: a.ToString()));
-                    if (a % 4 != 0) continue;
-                    Row.Add(Col.ToArray());
-                    Col = new List<InlineKeyboardButton>();
-                }
-                if (Col.Count > 0) { Row.Add(Col.ToArray()); }
+                    //формируем сообщение 
+                    for (int a = 0; a < search_file_names.Count; a++)
+                    {
+                        Answer_text += string.Format("{0}: {1}\r\n", a + 1, search_file_names[a]);
+                    }
+                    //формируем кнопки
+                    List<InlineKeyboardButton[]> Row = new List<InlineKeyboardButton[]>();
+                    List<InlineKeyboardButton> Col = new List<InlineKeyboardButton>();
+                    for (int a = 1; a < search_file_names.Count + 1; a++)
+                    {
+                        Col.Add(InlineKeyboardButton.WithCallbackData(text: a.ToString(), callbackData: a.ToString()));
+                        if (a % 4 != 0) continue;
+                        Row.Add(Col.ToArray());
+                        Col = new List<InlineKeyboardButton>();
+                    }
+                    if (Col.Count > 0) { Row.Add(Col.ToArray()); }
 
-                if (result)
-                {
-                    keyBoard = new InlineKeyboardMarkup(Row.ToArray());
-                    await botClient.SendTextMessageAsync(Message.Chat.Id, "Результаты поиска: \r\n\r\n" + Answer_text + "\r\nВыберите номер документа, который необходимо скачать:", replyMarkup: keyBoard);
-                    return;
+                    if (result)
+                    {
+                        keyBoard = new InlineKeyboardMarkup(Row.ToArray());
+                        await botClient.SendTextMessageAsync(Message.Chat.Id, "Результаты поиска: \r\n\r\n" + Answer_text + "\r\nВыберите номер документа, который необходимо скачать:", replyMarkup: keyBoard);
+                        return;
+                    }
                 }
             }
             if (Callback != null && Callback != "")
             {
                 string FileName = "";
                 int click_number = Convert.ToInt32(Callback);
-                if (search_file_names.Count >= click_number)
                 {
                     FileName = search_file_names[click_number - 1];
 
@@ -90,23 +101,30 @@ namespace ConsoleApp3
                     stream.Close();
                 }
             }
+
             if (Message != null && Message.Document != null)
             {
+                bool add_permission = Search_ID(Message.Chat.Id.ToString());
+                if (add_permission)
+                {
+                    var fileId = update.Message.Document.FileId;
+                    var fileInfo = await botClient.GetFileAsync(fileId);
+                    var filePath = fileInfo.FilePath;
 
+                    string dirName = AppDomain.CurrentDomain.BaseDirectory + "Instructions\\" + Message.Document.FileName;
+                    await using Stream stream = System.IO.File.OpenWrite(dirName);
+                    await botClient.DownloadFileAsync(filePath, stream);
+                    stream.Close();
 
+                    Search_File_Name();
+                    Delete_ID(Message.Chat.Id.ToString());
 
-
-
-                var fileId = update.Message.Document.FileId;
-                var fileInfo = await botClient.GetFileAsync(fileId);
-                var filePath = fileInfo.FilePath;
-
-                string dirName = AppDomain.CurrentDomain.BaseDirectory + "Instructions\\" + Message.Document.FileName;
-                await using Stream stream = System.IO.File.OpenWrite(dirName);
-                await botClient.DownloadFileAsync(filePath, stream);
-                stream.Close();
-
-                Search_File_Name();
+                    await botClient.SendTextMessageAsync(Message.Chat.Id, "Файл добавлен");
+                }
+                else
+                {
+                    await botClient.SendTextMessageAsync(Message.Chat.Id, "Для добавления файла введите сначала команду - Add New File");
+                }
             }
         } 
 
@@ -130,6 +148,44 @@ namespace ConsoleApp3
                 }
             }
         }
-        
+        private static void Add_ID(string ID)
+        {
+            bool search = false;
+            for (int i = 0; i < Add_New_File.Count; i++)
+            {
+                if (Add_New_File[i] == ID)
+                {
+                    search = true;
+                    break;
+                }
+            }
+            if (search == false)
+            {
+                Add_New_File.Add(ID);
+            }
+        }
+        private static void Delete_ID(string ID)
+        {
+            for (int i = 0; i < Add_New_File.Count; i++)
+            {
+                if (Add_New_File[i] == ID)
+                {
+                    Add_New_File.RemoveAt(i);
+                }
+            }
+        }
+        private static bool Search_ID(string ID)
+        {
+            bool search = false;
+            for (int i = 0; i < Add_New_File.Count; i++)
+            {
+                if (Add_New_File[i] == ID)
+                {
+                    search = true;
+                    break;
+                }
+            }
+            return search;
+        }
     }
 }

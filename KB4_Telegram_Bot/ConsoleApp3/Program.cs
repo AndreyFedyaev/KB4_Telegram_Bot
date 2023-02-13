@@ -15,16 +15,18 @@ namespace ConsoleApp3
 {
     internal class Program
     {
+        private static string API_Token = "";
+
         public static List<string> all_file_names = new List<string>();
         public static List<string> search_file_names = new List<string>();
         public static InlineKeyboardMarkup keyBoard;
         public static List<string> Add_New_File = new List<string>();
 
+
         static void Main(string[] args)
         {
             //считываем токен номер
-            Console.WriteLine("Введите API Token бота:");
-            string API_Token = Console.ReadLine();
+            Read_Token();
 
             //считываем при запуске список файлов
             Search_File_Name();
@@ -34,6 +36,29 @@ namespace ConsoleApp3
             client.StartReceiving(Update, Error);
 
             Console.ReadLine();
+        }
+        private static void Read_Token()
+        {
+            string path = AppDomain.CurrentDomain.BaseDirectory + "Token.txt";
+            if (System.IO.File.Exists(path))
+            {
+                using (StreamReader reader = new StreamReader(path))
+                {
+                    string text = reader.ReadLine();
+                    if (text != null && text.Trim() != "")
+                    {
+                        API_Token = text;
+                        Console.WriteLine("API Token успешно считан из файла!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Введите API Token бота:");
+                        API_Token = Console.ReadLine();
+                    }
+                }
+
+            }
+
         }
 
         private static async Task Update(ITelegramBotClient botClient, Update update, CancellationToken token)

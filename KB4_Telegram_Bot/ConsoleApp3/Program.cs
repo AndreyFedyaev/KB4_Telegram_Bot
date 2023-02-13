@@ -22,10 +22,15 @@ namespace ConsoleApp3
 
         static void Main(string[] args)
         {
+            //считываем токен номер
+            Console.WriteLine("Введите API Token бота:");
+            string API_Token = Console.ReadLine();
+
             //считываем при запуске список файлов
             Search_File_Name();
 
-            var client = new TelegramBotClient("5848453722:AAE4shNmKQ5_TEM3t6q_dBFtomLIJmY8y9g");
+            //выполняем подключение к боту
+            var client = new TelegramBotClient(API_Token);
             client.StartReceiving(Update, Error);
 
             Console.ReadLine();

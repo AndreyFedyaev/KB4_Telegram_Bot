@@ -8,13 +8,15 @@ using Telegram.Bot.Types.ReplyMarkups;
 using System.IO;
 using System.Text;
 using System.Windows.Input;
-
+using Telegram.Bot.Types.InputFiles;
+using System.Linq;
 
 namespace ConsoleApp3
 {
     internal class Program
     {
-        public static List<string> file_names = new List<string>();
+        public static List<string> all_file_names = new List<string>();
+        public static List<string> search_file_names = new List<string>();
         public static InlineKeyboardMarkup keyBoard;
 
         static void Main(string[] args)
@@ -37,33 +39,75 @@ namespace ConsoleApp3
 
             if (Message != null && Message.Text != null)
             {
-                List<InlineKeyboardButton[]> Row = new List<InlineKeyboardButton[]>();
-                List<InlineKeyboardButton> Col = new List<InlineKeyboardButton>();
                 bool result = false;
+                string Answer_text = "";
 
-                for (int a = 0; a < file_names.Count; a++)
+                //формируем список документов для формирования результата поиска
+                search_file_names.Clear();
+                for (int a = 0; a < all_file_names.Count; a++)
                 {
-                    if (file_names[a].ToLower().Contains(Message.Text.ToLower()))
+                    if (all_file_names[a].ToLower().Contains(Message.Text.ToLower()))
                     {
-                        Col.Add(InlineKeyboardButton.WithCallbackData(text: file_names[a].ToString(), callbackData: file_names[a].ToString()));
-                        Row.Add(Col.ToArray());
-                        Col = new List<InlineKeyboardButton>();
+                        search_file_names.Add(all_file_names[a]);
                         result = true;
                     }
                 }
+                //формируем сообщение 
+                for (int a = 0; a < search_file_names.Count; a++)
+                {
+                    Answer_text += string.Format("{0}: {1}\r\n", a + 1, search_file_names[a]);
+                }
+                //формируем кнопки
+                List<InlineKeyboardButton[]> Row = new List<InlineKeyboardButton[]>();
+                List<InlineKeyboardButton> Col = new List<InlineKeyboardButton>();
+                for (int a = 1; a < search_file_names.Count + 1; a++)
+                {
+                    Col.Add(InlineKeyboardButton.WithCallbackData(text: a.ToString(), callbackData: a.ToString()));
+                    if (a % 4 != 0) continue;
+                    Row.Add(Col.ToArray());
+                    Col = new List<InlineKeyboardButton>();
+                }
+                if (Col.Count > 0) { Row.Add(Col.ToArray()); }
 
                 if (result)
                 {
                     keyBoard = new InlineKeyboardMarkup(Row.ToArray());
-                    await botClient.SendTextMessageAsync(Message.Chat.Id, "Выберите файл из списка:", replyMarkup: keyBoard, cancellationToken: token);
+                    await botClient.SendTextMessageAsync(Message.Chat.Id, "Результаты поиска: \r\n\r\n" + Answer_text + "\r\nВыберите номер документа, который необходимо скачать:", replyMarkup: keyBoard);
                     return;
                 }
             }
             if (Callback != null && Callback != "")
             {
+                string FileName = "";
+                int click_number = Convert.ToInt32(Callback);
+                if (search_file_names.Count >= click_number)
+                {
+                    FileName = search_file_names[click_number - 1];
 
+                    string dirName = AppDomain.CurrentDomain.BaseDirectory + "Instructions\\" + FileName;
+                    await using Stream stream = System.IO.File.OpenRead(dirName);
+                    await botClient.SendDocumentAsync(update.CallbackQuery.From.Id, document: new InputOnlineFile(content: stream, fileName: FileName));
+                    stream.Close();
+                }
             }
+            if (Message != null && Message.Document != null)
+            {
 
+
+
+
+
+                var fileId = update.Message.Document.FileId;
+                var fileInfo = await botClient.GetFileAsync(fileId);
+                var filePath = fileInfo.FilePath;
+
+                string dirName = AppDomain.CurrentDomain.BaseDirectory + "Instructions\\" + Message.Document.FileName;
+                await using Stream stream = System.IO.File.OpenWrite(dirName);
+                await botClient.DownloadFileAsync(filePath, stream);
+                stream.Close();
+
+                Search_File_Name();
+            }
         } 
 
         private static Task Error(ITelegramBotClient arg1, Exception arg2, CancellationToken arg3)
@@ -79,11 +123,13 @@ namespace ConsoleApp3
             {
                 string[] files = Directory.GetFiles(dirName);
 
+                all_file_names.Clear();
                 foreach (string s in files)
                 {
-                    file_names.Add(s.Remove(0, dirName.Length + 1));
+                    all_file_names.Add(s.Remove(0, dirName.Length + 1).ToString());
                 }
             }
         }
+        
     }
 }
